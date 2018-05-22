@@ -1,0 +1,300 @@
+import React, {Component} from 'react'
+import { Modal, Button } from 'antd';
+import rangy from 'rangy/lib/rangy-selectionsaverestore';
+import MonkeyLexer from './MonkeyLexer'
+
+class MonkeyCompilerEditer extends Component {
+    constructor(props) {
+        super(props);
+        this.keyWords = props.keyWords;
+        // 初始化上一段的行数
+        rangy.init(); // 初始化光标获取
+        this.keyWordElementArray = []; // 默认关键词列表
+        this.identifierElementArray = []; // 变量列表
+        this.textNodeArray = [];
+        // 几种标签
+        this.keyWordClass = 'keyword';
+        this.lineNodeClass = 'line';
+        this.lineSpanNode = 'LineSpan';
+        this.identifierClass = 'Identifier';
+        this.spanToTokenMap = {};
+        // this.initPopoverControl()
+        this.keyToIngore = ['Enter', 'ArrowUp', 'ArrowDown',
+            'ArrowLeft', 'ArrowRight']; // 忽略回车空格上下左右
+    }
+
+    changeNode(n) {
+        var f = n.childNodes;
+        for (let c in f) {
+            this.changeNode(f[c]); // 递归到最终字符节点
+        }
+        if (n.data) {
+            this.lastBegin = 0; // 每一行读取 初始化起始位置0
+            n.keyWordCount = 0;
+            n.indentifierCount = 0;
+            const lexer = new MonkeyLexer(n.data);
+            this.lexer = lexer;
+            lexer.setLexingOberver(this, n); // 注册lexer中token监听函数
+            lexer.lexing();
+        }
+    }
+
+    notifyTokenCreation(token, elementNode, begin, end) { // 注册的监听函数
+        const e = {};
+        e.node = elementNode;
+        e.begin = begin;
+        e.end = end;
+        e.token = token;
+
+        if (this.keyWords[token.getLiteral()] !== undefined) {
+            elementNode.keyWordCount++;
+            this.keyWordElementArray.push(e)
+        }
+
+        if (elementNode.keyWordCount === 0 && token.getType() === this.lexer.IDENTIFIER) {
+            elementNode.identifierCount++;
+            this.identifierElementArray.push(e);
+        }
+
+    }
+
+    changeSpaceToNBSP(str) { // 将空格变为字符
+        let s = '';
+        for (let i = 0; i < str.length; i++) {
+            if (str[i] === ' ') {
+                s += '\u00a0'
+            } else {
+                s += str[i]
+            }
+        }
+
+        return s;
+    }
+
+    hightLightKeyWord(token, elementNode, begin, end) {
+        let strBefore = elementNode.data.substr(this.lastBegin,
+            begin - this.lastBegin);
+        strBefore = this.changeSpaceToNBSP(strBefore);
+
+        const textNode = document.createTextNode(strBefore);
+        const parentNode = elementNode.parentNode;
+        parentNode.insertBefore(textNode, elementNode);
+        this.textNodeArray.push(textNode);
+
+        const span = document.createElement('span');
+        span.classList.add(this.keyWordClass);
+        span.appendChild(document.createTextNode(token.getLiteral()))
+        parentNode.insertBefore(span, elementNode);
+
+        this.lastBegin = end - 1;
+        elementNode.keyWordCount--;
+
+    }
+
+
+    hightLightSyntax() { // 遍历关键词数组 将其高亮
+        this.textNodeArray = [];
+        this.keyWordElementArray.map((item) => {
+            this.currentElement = item.node;
+            this.hightLightKeyWord(item.token, item.node, item.begin, item.end);
+            if (this.currentElement.keyWordCount === 0) {
+                const end = this.currentElement.data.length;
+                let lastText = this.currentElement.data.substr(
+                    this.lastBegin,
+                    end
+                )
+                lastText = this.changeSpaceToNBSP(lastText);
+                const parent = this.currentElement.parentNode;
+                const lastNode = document.createTextNode(lastText);
+                parent.insertBefore(lastNode, this.currentElement);
+                this.textNodeArray.push(lastNode);
+                parent.removeChild(this.currentElement);
+            }
+        })
+        this.keyWordElementArray = []; // 处理结束后置空
+    }
+
+    getCaretLineNode() { // 获取变动的每一行的数据
+        const sel = document.getSelection();
+        // 光标所在位置
+        const nd = sel.anchorNode;
+        // 节点是编辑器，返回
+        if (nd.className === 'monkeycompilerediter' || nd.innerHTML === '<br>') {
+            return false;
+        }
+        // 光标所在node节点
+        // 查看其父节点是否是span,如果不是，
+        // 我们插入一个span节点用来表示光标所在的行
+        let currentLineSpan = null;
+        const elements = document.getElementsByClassName(this.lineSpanNode);
+        for (let i = 0; i < elements.length; i++) {
+            const element = elements[i];
+            if (element.contains(nd)) {
+                currentLineSpan = element;
+                // 确定所包含的span
+            }
+            while (element.classList.length > 0) {
+                // 移除所有的class 重新赋值
+                element.classList.remove(element.classList.item(0));
+            }
+            element.classList.add(this.lineSpanNode);
+            element.classList.add(this.lineNodeClass + i);
+        }
+        // 如果已经被加入span就返回 否则添加进span
+        if (currentLineSpan !== null) {
+            return currentLineSpan;
+        } else {
+            const divElements = this.divInstance.childNodes;
+            let l = 0; // 初始行号
+            // 计算一下当前光标所在节点的前面有多少个div节点，
+            // 前面的div节点数就是光标所在节点的行数
+            for (let i = 0; i < divElements.length; i++) {
+                if (divElements[i].tagName === 'DIV' &&
+                    divElements[i].contains(nd)) {
+                    l = i;
+                    break;
+                }
+            }
+            // 如果是第一行就是0个；
+            let spanNode = document.createElement('span');
+            spanNode.classList.add(this.lineSpanNode);
+            spanNode.classList.add(this.lineNodeClass + l);
+            nd.parentNode.replaceChild(spanNode, nd);
+            spanNode.appendChild(nd);
+            return spanNode;
+
+        }
+
+    }
+
+    errorHandling() {
+        // 阻止浏览器创建font标签
+        const fontList = this.divInstance.getElementsByTagName('font');
+        for (let i = 0; i < fontList.length; i++) {
+            fontList[i].parentNode.removeChild(fontList[i]);
+        }
+
+    }
+
+    onDivContentChange(evt) {
+        this.errorHandling();
+        // 设置行号
+        this.setState({
+            totalIndex: this.divInstance.childNodes.length - 1
+        });
+
+        // 一些BUG处理
+        if (this.keyToIngore.indexOf(evt.key) >= 0) {
+            return;
+        } else if (
+            this.divInstance.childNodes.length === 1 &&
+            this.divInstance.firstChild.innerText === ''
+        ) {
+            return;
+        } else if (!this.divInstance.innerText) {
+            return;
+        }
+
+        let bookmark = undefined;
+        if (evt.key !== 'Enter') {
+            bookmark = rangy.getSelection().getBookmark(this.divInstance);
+        }
+
+        // 判断行数 前后行数差大于1 全部重新刷新
+        let lineCount = this.divInstance.childNodes.length || 0;
+        if (lineCount - this.lastLineCount < 0) {
+            this.lastLineCount = lineCount;
+
+            const childs = this.divInstance.childNodes;
+            for (let i = 0; i < childs.length; i++) {
+                let innerText = childs[i].innerText;
+                childs[i].innerHTML = '';
+                childs[i].innerText = innerText;
+            }
+            // //把所有相邻的text node 合并成一个
+            this.divInstance.normalize();
+            this.changeNode(this.divInstance);
+            this.hightLightSyntax();
+            return;
+        }
+        this.lastLineCount = lineCount;
+        // 获取光标所在行的
+        // 并换成普通的内容 重新处理
+        var currentLine = this.getCaretLineNode();
+
+        if (!currentLine) {
+            return;
+        }
+        for (let i = 0; i < currentLine.childNodes.length; i++) {
+            if (currentLine.childNodes[i].className
+                === this.keyWordClass ||
+                currentLine.childNodes[i].className === this.identifierClass) {
+                var child = currentLine.childNodes[i];
+                var t = document.createTextNode(child.innerText);
+                currentLine.replaceChild(t, child);
+            }
+        }
+        // 把所有相邻的text node 合并成一个
+        currentLine.normalize();
+        this.identifierElementArray = [];
+        this.changeNode(currentLine);
+        this.hightLightSyntax();
+        // this.preparePopoverForIdentifers();
+
+        // 光标恢复
+
+        if (evt.key !== 'Enter') {
+            rangy.getSelection().moveToBookmark(bookmark);
+        }
+
+
+    }
+
+    // 生命周期
+    componentWillMount() {
+        this.setState({
+            totalIndex: 0
+        })
+    }
+
+    getIndexList(index) {
+        const list = [];
+        for (var i = 1; i <= index; i++) {
+            list.push(
+                <li key={i} className="indexitem">{i}</li>
+            )
+        }
+        return list;
+    }
+    onDivPaste(e){
+        // 出现粘贴时
+        e.preventDefault();
+        Modal.confirm({
+            title:'提示',
+            content:'多行插入正在开发~'
+        })
+    }
+    render() {
+        const list = this.getIndexList(this.state.totalIndex);
+        return (
+            <div className={'monkeycompilereditercontainer'}>
+                <ul className={'indexcontainer'}
+                >
+                    <li>0</li>
+                    {list}
+                </ul>
+                <div className={'monkeycompilerediter'}
+                     contentEditable
+                     onPaste={this.onDivPaste.bind(this)}
+                     onKeyUp={this.onDivContentChange.bind(this)}
+                     ref={(ref) => {
+                         this.divInstance = ref
+                     }}
+                >
+                </div>
+            </div>
+        )
+    }
+}
+
+export default MonkeyCompilerEditer;

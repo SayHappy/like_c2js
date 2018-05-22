@@ -244,7 +244,7 @@ class MonkeyCompilerEditer extends Component{
                 this.addPopoverByIdentifierArray()
             }
             this.textNodeArray = []
-        } else {
+         } else {
         	this.addPopoverByIdentifierArray()
         }
     	

@@ -1,18 +1,19 @@
 import React, {Component} from 'react'
 
-class MonkeyCompilerEditer extends Component {
+
+class SourceContainer extends Component {
     constructor(props) {
         super(props);
     }
 
     render() {
         return (
-            <div className={'monkeycompilerediter'}
-                 contentEditable
+            <div className="sourcecontainer"
             >
+                这里是资源列表
             </div>
         )
     }
 }
 
-export default MonkeyCompilerEditer;
+export default SourceContainer;

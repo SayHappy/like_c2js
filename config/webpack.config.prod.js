@@ -84,7 +84,7 @@ module.exports = {
     ),
     // These are the reasonable defaults supported by the Node ecosystem.
     // We also include JSX as a common component filename extension to support
-    // some tools, although we do not recommend using it, see:
+    // some utils, although we do not recommend using it, see:
     // https://github.com/facebookincubator/create-react-app/issues/290
     // `web` extension prefixes have been added for better support
     // for React Native Web.
@@ -288,7 +288,7 @@ module.exports = {
       filename: cssFilename,
     }),
     // Generate a manifest file which contains a mapping of all asset filenames
-    // to their corresponding output file so that tools can pick it up without
+    // to their corresponding output file so that utils can pick it up without
     // having to parse `index.html`.
     new ManifestPlugin({
       fileName: 'asset-manifest.json',

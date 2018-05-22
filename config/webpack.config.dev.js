@@ -78,7 +78,7 @@ module.exports = {
         ),
         // These are the reasonable defaults supported by the Node ecosystem.
         // We also include JSX as a common component filename extension to support
-        // some tools, although we do not recommend using it, see:
+        // some utils, although we do not recommend using it, see:
         // https://github.com/facebookincubator/create-react-app/issues/290
         // `web` extension prefixes have been added for better support
         // for React Native Web.
@@ -218,6 +218,7 @@ module.exports = {
         ],
     },
     plugins: [
+
         // Makes some environment variables available in index.html.
         // The public URL is available as %PUBLIC_URL% in index.html, e.g.:
         // <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico">

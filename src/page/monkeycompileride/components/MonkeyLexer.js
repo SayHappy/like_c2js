@@ -35,7 +35,7 @@ class MonkeyLexer { // 词法解析器类
         this.ch = ''; // 读取到的字符
 
         this.observer = null;
-        this.observerContext = null;
+        this.observerContext = {};
 
     }
 
@@ -82,6 +82,15 @@ class MonkeyLexer { // 词法解析器类
 
     }
 
+    setLexingOberver(o, context) {
+        if (o !== null && o !== undefined && context !== undefined
+        && context !== null) {
+            this.observer = o;
+            this.observerContext = context;
+            console.log(context);
+        }
+    }
+
     readChar() { // 字符读取
         if (this.readPosition >= this.sourceCode.length) {
             this.ch = -1
@@ -109,6 +118,10 @@ class MonkeyLexer { // 词法解析器类
             }
             this.readChar();
         }
+    }
+
+    getKeyWords() {
+        return this.keyWordMap;
     }
 
     nextToken() {
@@ -203,9 +216,9 @@ class MonkeyLexer { // 词法解析器类
     }
 
     notifyObserver(token) { // 通知观察者
-        if(this.observer !== null) {
+        if (this.observer !== null) {
             this.observer.notifyTokenCreation(token,
-                this.observerContext, this.position-1,
+                this.observerContext, this.position - 1,
                 this.readPosition)
         }
     }
@@ -243,7 +256,7 @@ class MonkeyLexer { // 词法解析器类
         this.readChar(); // 读取第一个字符
         this.tokens = [];
         let token = this.nextToken();
-        while (token !== undefined && token.getType() !== this.EOF){
+        while (token !== undefined && token.getType() !== this.EOF) {
             this.tokens.push(token);
             token = this.nextToken();
         }
