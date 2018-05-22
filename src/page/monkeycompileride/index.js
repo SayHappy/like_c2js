@@ -34,9 +34,9 @@ class MonkeyCompilerIDE extends Component {
                         keyWords={this.lexer.getKeyWords()}
                     ></MonkeyCompilerEditer>
                 </div>
-                <div className="outputpanel">
-                    <OutputContainer></OutputContainer>
-                </div>
+                {/*<div className="outputpanel">*/}
+                    {/*<OutputContainer></OutputContainer>*/}
+                {/*</div>*/}
             </div>
         );
     }
