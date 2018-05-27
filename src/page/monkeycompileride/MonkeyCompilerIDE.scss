@@ -7,10 +7,6 @@
   display: flex;
   flex-direction: column;
   justify-content: left;
-  ::-webkit-scrollbar-track {
-    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
-    background: rgb(23, 23, 23);
-  }
   .idebanner {
     max-height: 40px;
     min-height: 40px;

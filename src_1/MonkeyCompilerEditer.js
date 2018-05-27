@@ -237,6 +237,8 @@ class MonkeyCompilerEditer extends Component{
 
     preparePopoverForIdentifers() {
         if (this.textNodeArray.length > 0) {
+            //fix bug
+            this.identifierElementArray = []
             for (var i = 0; i < this.textNodeArray.length; i++) {
             	//将text 节点中的文本提交给词法解析器抽取IDENTIFIER
                 this.changeNode(this.textNodeArray[i])
@@ -244,7 +246,7 @@ class MonkeyCompilerEditer extends Component{
                 this.addPopoverByIdentifierArray()
             }
             this.textNodeArray = []
-         } else {
+        } else {
         	this.addPopoverByIdentifierArray()
         }
     	

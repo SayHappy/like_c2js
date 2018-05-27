@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import {Icon} from 'antd';
 import MonkeyLexer from './components/MonkeyLexer';
 import MonkeyCompilerEditer from './components/MonkeyCompilerEditer';
 import SourceContainer from './components/SourceContainer';
@@ -14,7 +15,7 @@ class MonkeyCompilerIDE extends Component {
         this.lexer = new MonkeyLexer('');
     }
 
-    onLexingClick(){
+    onLexingClick() {
         this.lexer = new MonkeyLexer(this.inputInstance.getContent());
     }
 
@@ -23,20 +24,21 @@ class MonkeyCompilerIDE extends Component {
             <div className="monkeycompileride">
                 {/*<IDEbanner></IDEbanner>*/}
                 <div className="idebanner">
-                    <ul>
-                        <li></li>
+                    <ul className={'idebannercontainer'}>
+                        <li className={'idebanneritem'}>
+                            <Icon style={{color:'green'}} type="caret-right"/>
+                        </li>
                     </ul>
                 </div>
                 <div className={'controlpanel'}>
                     <SourceContainer></SourceContainer>
                     <MonkeyCompilerEditer
-                        ref={(ref) =>{this.inputInstance = ref}}
+                        ref={(ref) => {
+                            this.inputInstance = ref
+                        }}
                         keyWords={this.lexer.getKeyWords()}
                     ></MonkeyCompilerEditer>
                 </div>
-                {/*<div className="outputpanel">*/}
-                    {/*<OutputContainer></OutputContainer>*/}
-                {/*</div>*/}
             </div>
         );
     }
