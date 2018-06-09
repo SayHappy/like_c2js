@@ -3,7 +3,7 @@
   color: white;
   height: 100vh;
   padding-top: 40px;
-  overflow-y:scroll;
+  overflow-y: scroll;
   display: flex;
   flex-direction: column;
   justify-content: left;
@@ -12,6 +12,14 @@
     min-height: 40px;
     background: rgb(60, 63, 65);
     box-shadow: 0px -1px 2px #eee inset;
+    .idebannercontainer{
+      .idebanneritem{
+        float: right;
+        line-height: 40px;
+        text-shadow: 1px 1px 1px white;
+        margin-right: 50px;
+      }
+    }
   }
   .controlpanel {
     /*定义滚动条轨道 内阴影+圆角*/
@@ -40,7 +48,7 @@
         min-width: 35px;
         padding: 10px 0;
         li {
-          padding:0  10px;
+          padding: 0 10px;
           background: rgb(52, 52, 52);
           font-size: 80%;
           line-height: 23px;
@@ -49,7 +57,7 @@
         }
       }
       .monkeycompilerediter {
-        .keyword{
+        .keyword {
           color: yellow;
           font-weight: 600;
         }

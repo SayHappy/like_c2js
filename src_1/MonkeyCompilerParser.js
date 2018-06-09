@@ -79,6 +79,7 @@ class ExpressionStatement extends Statement {
   }
 }
 
+// 前序表达式
 class PrefixExpression extends Expression {
   constructor(props) {
     super(props)

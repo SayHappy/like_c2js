@@ -70,6 +70,65 @@ class MonkeyLexer { // 词法解析器类
         this.RIGHT_PARENT = 24;
     }
 
+    getLiteralByTokenType(type) {
+        switch (type) {
+            case this.EOF:
+                return "end of file";
+            case this.LET:
+                return "let";
+            case this.IDENTIFIER:
+                return "identifier";
+            case this.ASSIGN_SIGN:
+                return "assign sign";
+            case this.PLUS_SIGN:
+                return "plus sign";
+            case this.INTEGER:
+                return "integer";
+            case this.SEMICOLON:
+                return "semicolon";
+            case this.IF:
+                return "if";
+            case this.ELSE:
+                return "else";
+            case this.MINUS_SIGN:
+                return "minus sign";
+            case this.BANG_SIGN:
+                return "!";
+            case this.ASTERISK:
+                return "*";
+            case this.SLASH:
+                return "slash";
+            case this.LT:
+                return "<";
+            case this.GT:
+                return ">";
+            case this.COMMA:
+                return ",";
+            case this.FUNCTION:
+                return "fun";
+            case this.TRUE:
+                return "true";
+            case this.FALSE:
+                return "fasle";
+            case this.RETURN:
+                return "return";
+            case this.LEFT_BRACE:
+                return "{";
+            case this.RIGHT_BRACE:
+                return "}";
+            case this.EQ:
+                return "==";
+            case this.NOT_EQ:
+                return "!=";
+            case this.LEFT_PARENT:
+                return "(";
+            case this.RIGHT_PARENT:
+                return ")";
+            default:
+                return "unknow token"
+        }
+    }
+
     initKeywords() { // 初始化关键词
         this.keyWordMap = new Map();
         this.keyWordMap['let'] = new Token(this.LET, 'let', 0);

@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import {Modal, Button, Card} from 'antd';
+import {Modal, Card} from 'antd';
 import rangy from 'rangy/lib/rangy-selectionsaverestore';
 import MonkeyLexer from './MonkeyLexer'
 
@@ -264,6 +264,9 @@ class MonkeyCompilerEditer extends Component {
     // 关键字标注部分
     // 关键字标注部分
 
+    getContent () {
+        return this.divInstance.innerText
+    }
     onDivContentChange(evt) {
         this.errorHandling();
         // 设置行号

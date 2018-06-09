@@ -3,6 +3,7 @@ import {Icon} from 'antd';
 import MonkeyLexer from './components/MonkeyLexer';
 import MonkeyCompilerEditer from './components/MonkeyCompilerEditer';
 import SourceContainer from './components/SourceContainer';
+import MonkeyCompilerParser from './components/MonkeyCompilerParser';
 import OutputContainer from './components/OutputContainer';
 // import IDEbanner from './components/IDEbanner';
 
@@ -17,6 +18,9 @@ class MonkeyCompilerIDE extends Component {
 
     onLexingClick() {
         this.lexer = new MonkeyLexer(this.inputInstance.getContent());
+        this.parser = new MonkeyCompilerParser(this.lexer);
+        this.parser.parseProgram();
+        // change here
     }
 
     render() {
@@ -25,7 +29,8 @@ class MonkeyCompilerIDE extends Component {
                 {/*<IDEbanner></IDEbanner>*/}
                 <div className="idebanner">
                     <ul className={'idebannercontainer'}>
-                        <li className={'idebanneritem'}>
+                        <li onClick={this.onLexingClick.bind(this)}
+                            className={'idebanneritem'}>
                             <Icon style={{color:'green'}} type="caret-right"/>
                         </li>
                     </ul>
